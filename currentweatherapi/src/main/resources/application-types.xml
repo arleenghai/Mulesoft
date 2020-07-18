@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="string" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+    <types:type name="CurrentWeatherDataResponse" format="json">
+      <types:shape format="weave" example="examples/currentweatherdataResponse.json"><![CDATA[%dw 2.0
+
+type CurrentWeatherDataResponse = {|
+  coord: {|
+    lon: Number {"typeId": "double"}, 
+    lat: Number {"typeId": "double"}
+  |}, 
+  weather: Array<{|    id: Number {"typeId": "int"},     main: String,     description: String,     icon: String  |}>, 
+  base: String, 
+  main: {|
+    temp: Number {"typeId": "double"}, 
+    feels_like: Number {"typeId": "double"}, 
+    temp_min: Number {"typeId": "double"}, 
+    temp_max: Number {"typeId": "double"}, 
+    pressure: Number {"typeId": "int"}, 
+    humidity: Number {"typeId": "int"}
+  |}, 
+  visibility: Number {"typeId": "int"}, 
+  wind: {|
+    speed: Number {"typeId": "double"}, 
+    deg: Number {"typeId": "int"}
+  |}, 
+  clouds: {| all: Number {"typeId": "int"} |}, 
+  dt: Number {"typeId": "int"}, 
+  sys: {|
+    "type": Number {"typeId": "int"}, 
+    id: Number {"typeId": "int"}, 
+    country: String, 
+    sunrise: Number {"typeId": "int"}, 
+    sunset: Number {"typeId": "int"}
+  |}, 
+  timezone: Number {"typeId": "int"}, 
+  id: Number {"typeId": "int"}, 
+  name: String, 
+  cod: Number {"typeId": "int"}
+|} {"example": "{\\\"coord\\\":{\\\"lon\\\":144.94,\\\"lat\\\":-37.81},\\\"weather\\\":[{\\\"id\\\":804,\\\"main\\\":\\\"Clouds\\\",\\\"description\\\":\\\"overcast clouds\\\",\\\"icon\\\":\\\"04d\\\"}],\\\"base\\\":\\\"stations\\\",\\\"main\\\":{\\\"temp\\\":285.48,\\\"feels_like\\\":277.04,\\\"temp_min\\\":283.15,\\\"temp_max\\\":283.15,\\\"pressure\\\":1018,\\\"humidity\\\":66},\\\"visibility\\\":10000,\\\"wind\\\":{\\\"speed\\\":10.8,\\\"deg\\\":10},\\\"clouds\\\":{\\\"all\\\":100},\\\"dt\\\":1595037603,\\\"sys\\\":{\\\"type\\\":1,\\\"id\\\":9548,\\\"country\\\":\\\"AU\\\",\\\"sunrise\\\":1595021456,\\\"sunset\\\":1595056895},\\\"timezone\\\":36000,\\\"id\\\":7839805,\\\"name\\\":\\\"Melbourne\\\",\\\"cod\\\":200}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#870e1a72-f82e-4a5b-8ed5-a71ef8c95cb7">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:variables>
+          <types:variable name="ApiKey" type="string"/>
+          <types:variable name="Id" type="string"/>
+        </types:variables>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#b1bd3df0-d9fa-4523-af06-e16421dcf7fd">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="CurrentWeatherDataResponse"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="CurrentWeatherDataResponse"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

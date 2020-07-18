@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="c09b1dd5-62b4-4438-a3fb-8ee885a34e25" >
+		<http:request-connection host="api.openweathermap.org" port="443" protocol="HTTPS"/>
+	</http:request-config>
+	<sub-flow name="By-City-Id" doc:id="85b2ce3e-1568-4054-b96c-a706daac91f1" >
+		<logger level="INFO" doc:name="Start" doc:id="03143be7-aeda-4833-8aea-c1983c615a56" message="commencement of weather data get"/>
+		<http:request method="GET" doc:name="Invoke request to open weather map to get current data for Melbourne" doc:id="be4185d0-f212-49a4-91d7-af5f0037659a" config-ref="HTTP_Request_configuration" path="/data/2.5/weather">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	appid : vars.ApiKey,
+	id : vars.CityId
+}]]]></http:query-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="b1bd3df0-d9fa-4523-af06-e16421dcf7fd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	coord: {
+		lon: payload.coord.lon,
+		lat: payload.coord.lat
+	},
+	weather: payload.weather map ( weather , indexOfWeather ) -> {
+		id: weather.id,
+		main: weather.main,
+		description: weather.description,
+		icon: weather.icon
+	},
+	base: payload.base,
+	main: {
+		temp: payload.main.temp,
+		feels_like: payload.main.feels_like,
+		temp_min: payload.main.temp_min,
+		temp_max: payload.main.temp_max,
+		pressure: payload.main.pressure,
+		humidity: payload.main.humidity
+	},
+	visibility: payload.visibility,
+	wind: {
+		speed: payload.wind.speed,
+		deg: payload.wind.deg
+	},
+	clouds: {
+		all: payload.clouds.all
+	},
+	dt: payload.dt,
+	sys: {
+		"type": payload.sys."type",
+		id: payload.sys.id,
+		country: payload.sys.country,
+		sunrise: payload.sys.sunrise,
+		sunset: payload.sys.sunset
+	},
+	timezone: payload.timezone,
+	id: payload.id,
+	name: payload.name,
+	cod: payload.cod
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Completed" doc:id="0f162642-4728-4766-a92c-c38da567f0cd" message="Completion of weather data get"/>
+	</sub-flow>
+</mule>
