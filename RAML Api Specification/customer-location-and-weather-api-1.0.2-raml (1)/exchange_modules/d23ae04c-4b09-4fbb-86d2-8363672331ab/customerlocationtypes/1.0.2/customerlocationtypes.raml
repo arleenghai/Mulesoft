@@ -1,0 +1,86 @@
+#%RAML 1.0 Library
+usage: |
+  Customer Location and Weather data types
+
+securitySchemes:
+  basic:
+    type: Basic Authentication
+    description: This trait defines a set of common headers reserved for securely authenticate the caller (calling application, not end-user).
+    
+types:
+  CustomerRequest:
+    type: object
+    description: Customer Information
+    properties:
+      name:
+        type: string
+        description: First Name
+        example: "John"
+      lastName:
+        type: string
+        description: Last Name
+        example: "Smith"
+      dateTime:
+        type: datetime
+        example: 2019-01-31T19:00:00Z
+        format: rfc3339 # the default, so needn't be specified
+      city:
+        type: string
+        description: city name
+        example: "Melbourne"
+      country:
+        type: string
+        description: country
+        example: "au"
+
+  CustomerResponse:
+    type: object
+    description: Customer Information
+    properties:
+      lastName:
+        type: string
+        description: Last Name
+        example: "Smith"
+      name:
+        type: string
+        description: First Name
+        example: "John"
+      timmeZone:
+        type: string
+        example: "6500"
+      offfset:
+        type: string
+        example: "35rfdgrt"
+      fullName:
+        type: string
+        description: Fullname
+        example: "John Smith"
+      temperatureCelcius:
+        type: number
+        description: Temperature
+        example: 284.67
+      dateTime:
+        type: datetime
+        example: 2019-01-31T19:00:00Z
+        format: rfc3339 # the default, so needn't be specified          
+      city:
+        type: string
+        description: city name
+        example: "Melbourne"
+      location:
+        type: string
+        description: Location
+        example: "au"
+  Error:
+    type: object
+    properties:
+      code:
+        description: Error Code
+        example: 058
+        type: number
+      errormessage:
+        description: Error Message
+        example: Failed to get the weather data
+        type: string
+      
+      

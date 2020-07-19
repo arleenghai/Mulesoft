@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+    <http:listener-config name="customer-location-and-weather-api-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+    <apikit:config name="customer-location-and-weather-api-config" api="resource::d23ae04c-4b09-4fbb-86d2-8363672331ab:customer-location-and-weather-api:1.0.2:raml:zip:customer-location-and-weather-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="customer-location-and-weather-api-main" doc:id="4f33e551-5a20-4c29-a5e2-faa09dbb822e">
+		<http:listener doc:name="Listener" doc:id="2d6e6a38-64ad-4f1a-9c5a-5f69799b6e85" config-ref="customer-location-and-weather-api-httpListenerConfig" path="/api/*">
+			<http:response statusCode="#[vars.httpStatus default 200]">
+				<http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+			</http:response>
+			<http:error-response statusCode="#[vars.httpStatus default 500]">
+				<http:body><![CDATA[#[payload]]]></http:body>
+				<http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+			</http:error-response>
+		</http:listener>
+		<apikit:router doc:name="APIkit Router" doc:id="4de8a68a-e9d4-4d7d-a9a5-d24ca28df4d7" config-ref="customer-location-and-weather-api-config" />
+		<error-handler ref="generic-apikit-error-handler" doc:id="d25cd6ad-e620-43a0-9e8e-ae367dc3c559" />
+	</flow>
+	<flow name="customer-location-and-weather-api-console" doc:id="bbc8afd9-eae5-441a-9479-74d40cbe14cc">
+		<http:listener doc:name="Listener" doc:id="481786ff-ba6b-4c96-8da2-70883099e054" config-ref="customer-location-and-weather-api-httpListenerConfig" path="/console/*">
+			<http:response statusCode="#[vars.httpStatus default 200]">
+				<http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+			</http:response>
+			<http:error-response statusCode="#[vars.httpStatus default 500]">
+				<http:body><![CDATA[#[payload]]]></http:body>
+				<http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+			</http:error-response>
+		</http:listener>
+		<apikit:console doc:name="APIkit Console" doc:id="76b35dd1-2ef5-4b02-939b-7028ebfd1c15" config-ref="customer-location-and-weather-api-config" />
+		<error-handler ref="generic-apikit-error-handler" />
+	</flow>
+	<flow name="post:\data:application\json:customer-location-and-weather-api-config">
+        <flow-ref doc:name="Current Weather For Given City" doc:id="40a89554-c838-4b90-93aa-7ebf82458bb3" name="CurrentWeatherForGivenCity" />
+		<error-handler ref="common-error-handler" />
+    </flow>
+</mule>

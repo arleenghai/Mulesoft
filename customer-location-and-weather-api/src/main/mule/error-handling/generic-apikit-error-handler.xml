@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
+	<error-handler name="generic-apikit-error-handler" doc:id="275a5f7c-e807-4968-a4c2-f869b84b5ba6" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="11029379-6dbd-4e7d-aa1f-bba8187afc5c" type="APIKIT:BAD_REQUEST" >
+			<ee:transform doc:name="Set Error Variables" doc:id="f0abf51e-5299-4d3a-8781-99d618347716" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+				<ee:message />
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[400]]></ee:set-variable>
+					<ee:set-variable variableName="responseDescription" ><![CDATA["Bad request"]]></ee:set-variable>
+					<ee:set-variable variableName="additionalDetails" ><![CDATA[error.description]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="Send Error Response" doc:id="81f3422d-96a8-42a2-856d-3d3777465dfd" name="shared-flows-send-error-response" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="7b6c1d8e-df7c-4d58-b023-58d5db8da835" type="APIKIT:NOT_FOUND" >
+			<ee:transform doc:name="Set Error Variables" doc:id="814c6734-55d6-4dea-bc90-92137cd70cb7" >
+				<ee:message />
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[404]]></ee:set-variable>
+					<ee:set-variable variableName="responseDescription" ><![CDATA["Resource not found"]]></ee:set-variable>
+					<ee:set-variable variableName="additionalDetails" ><![CDATA[error.description]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="Send Error Response" doc:id="9a16eeaa-5803-4506-b55e-c247be66d762" name="shared-flows-send-error-response" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1bb26d32-f259-4563-aa74-850a781f401e" type="APIKIT:METHOD_NOT_ALLOWED" >
+			<ee:transform doc:name="Set Error Variables" doc:id="cfb4cff5-8c01-4aa1-82a7-8bb531b4819e" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+				<ee:message />
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[405]]></ee:set-variable>
+					<ee:set-variable variableName="responseDescription" ><![CDATA["Method not allowed"]]></ee:set-variable>
+					<ee:set-variable variableName="additionalDetails" ><![CDATA[error.description]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="Send Error Response" doc:id="ca90c2f2-0712-4a23-9f9a-e8fd6240166e" name="shared-flows-send-error-response" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="34cc9e3a-6aa3-4c35-85e3-a5878069a755" type="APIKIT:NOT_ACCEPTABLE" >
+			<ee:transform doc:name="Set Error Variables" doc:id="4c36570a-ad8d-4068-b0cc-8a5eccf6ada1" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+				<ee:message />
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[406]]></ee:set-variable>
+					<ee:set-variable variableName="responseDescription" ><![CDATA["Not acceptable"]]></ee:set-variable>
+					<ee:set-variable variableName="additionalDetails" ><![CDATA[error.description]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="Send Error Response" doc:id="557570e3-37c1-4a4f-b0c1-a21c467e25dd" name="shared-flows-send-error-response" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="3b37e085-c9b9-4635-b304-c0562bcda407" type="APIKIT:UNSUPPORTED_MEDIA_TYPE" >
+			<ee:transform doc:name="Set Error Variables" doc:id="503b1758-f231-4f1e-a4f7-e9b08fa4a3af" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+				<ee:message />
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[415]]></ee:set-variable>
+					<ee:set-variable variableName="responseDescription" ><![CDATA["Unsupported media type"]]></ee:set-variable>
+					<ee:set-variable variableName="additionalDetails" ><![CDATA[error.description]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="Send Error Response" doc:id="a47108ee-4b4e-4751-b29d-8639803d9c39" name="shared-flows-send-error-response" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="cf30b92c-7219-4da2-993f-71a537279ee4" type="APIKIT:NOT_IMPLEMENTED" >
+			<ee:transform doc:name="Set Error Variables" doc:id="9024f064-2842-44c7-8594-38e8a41b1a51" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+				<ee:message />
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[501]]></ee:set-variable>
+					<ee:set-variable variableName="responseDescription" ><![CDATA["Not Implemented"]]></ee:set-variable>
+					<ee:set-variable variableName="additionalDetails" ><![CDATA[error.description]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="Send Error Response" doc:id="e0c24b50-3b68-4f9f-b3bb-445e29966ef4" name="shared-flows-send-error-response" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="ed3f26ab-85cc-4790-81a5-cdee6fbdc006" type="HTTP:BASIC_AUTHENTICATION" >
+			<ee:transform doc:name="Set Error Variables" doc:id="bad2c69e-0646-4c76-8123-46a3242ba75c" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+				<ee:message />
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[401]]></ee:set-variable>
+					<ee:set-variable variableName="responseDescription" ><![CDATA["Unauthorized"]]></ee:set-variable>
+					<ee:set-variable variableName="additionalDetails" ><![CDATA[error.description]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="Send Error Response" doc:id="62f6a46a-8b9c-45b4-82d3-0b57f481d0ca" name="shared-flows-send-error-response" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="08fbcb32-2f7e-4f41-9ba2-517da6975f4c" type="ANY">
+			<ee:transform doc:name="Set Error Variables" doc:id="c6d19f2d-ff47-4a56-b290-725d38e12d28" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+				<ee:message />
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[500]]></ee:set-variable>
+					<ee:set-variable variableName="responseDescription" ><![CDATA[if(error.errorType.Identifier != null)
+((error.errorType.namespace default "" ) ++ ":" 
+++ (error.errorType.Identifier default"")) 
+else "UNKNOWN"]]></ee:set-variable>
+					<ee:set-variable variableName="additionalDetails" ><![CDATA[error.description]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="Send Error Response" doc:id="0f511e49-bddd-4ed0-843d-706a96baac50" name="shared-flows-send-error-response" />
+		</on-error-propagate>
+	</error-handler>
+	
+	</mule>

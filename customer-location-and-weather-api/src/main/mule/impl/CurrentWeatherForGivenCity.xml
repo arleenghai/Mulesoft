@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="d91c3c95-1f7e-4bad-9f31-ade984ddef3d" >
+		<http:request-connection protocol="HTTPS" host="api.openweathermap.org" port="443" />
+	</http:request-config>
+	<sub-flow name="CurrentWeatherForGivenCity" doc:id="c8bbc510-3768-4658-89ca-6c905553bcba" >
+		<logger level="INFO" doc:name="Start" doc:id="cb559651-a85d-4b2d-9a10-141bf1cf3485" message="Commencement of Weather information details"/>
+		<ee:transform doc:name="save Initial Request" doc:id="5004317b-1acc-4b28-b9d2-43dee1fd53c4" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="customerInformation" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	name: payload.name,
+	lastName: payload.lastName,
+	dateTime: payload.dateTime,
+	city: payload.city,
+	country: payload.country
+}]]></ee:set-variable>
+				<ee:set-variable variableName="cityandcountry" ><![CDATA[payload.city ++ "," ++ payload.country]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<http:request method="GET" doc:name="get current weather data for given city" doc:id="92d70b0c-8335-4ab2-81ed-324fc9b89bfd" config-ref="Weather-Data-HTTP_Request_configuration" path="data/2.5/weather">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	q : vars.cityandcountry,
+	appid : "d6766ea74b0d1a0e007025a47ed6afa2"
+}]]]></http:query-params>
+		</http:request>
+		<validation:validate-size doc:name="Check if current weather data is retrieved" doc:id="3892ed9c-e9db-40ad-9cad-655beaaffb47" value="#[payload]" min="1" message="Current weather data retrieval failure">
+			<error-mapping sourceType="VALIDATION:INVALID_SIZE" targetType="WEATHER_DATA:INTERNAL_SERVER_FAILURE" />
+		</validation:validate-size>
+		<ee:transform doc:name="transforming weather data intoFinal Output" doc:id="9858a742-c0bd-454e-b0f4-e391d8841360" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	lastName: vars.customerInformation.lastName,
+	name: vars.customerInformation.name,
+	timmeZone: payload.timezone as String,
+	offfset: null,
+	fullName: vars.customerInformation.name ++ " " ++ vars.customerInformation.lastName,
+	temperatureCelcius: payload.main.temp,
+	dateTime: now() + |P1D|,
+	city: payload.name,
+	location: payload.sys.country
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Completed" doc:id="630007b5-8e17-4881-a7f3-590f5cceee21" message="Completion of Weather information details"/>
+	</sub-flow>
+</mule>

@@ -1,0 +1,49 @@
+#%RAML 1.0
+title: Customer Location and Weather API
+description: |
+       This API is used to get the customer current location details
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/b744794c-f4a3-48d2-acc2-39866f5b61f1/ # baseUri: https://anypoint.mulesoft.com
+version: v1
+mediaType: 
+  - application/json
+protocols:
+  - HTTP
+  - HTTPS
+
+uses:
+  CustomerLocationTypes: /exchange_modules/d23ae04c-4b09-4fbb-86d2-8363672331ab/customerlocationtypes/1.0.2/customerlocationtypes.raml
+
+securedBy:
+  - CustomerLocationTypes.basic
+
+/data:
+  description: customer information
+  post:
+    body:
+      application/json:
+        type: CustomerLocationTypes.CustomerRequest
+    responses:
+      200:
+        body:
+          application/json:
+            type: CustomerLocationTypes.CustomerResponse
+      201:
+        body:
+          application/json:
+            type: CustomerLocationTypes.CustomerResponse
+      '400':
+          description: Invalid Request Message
+      '401':
+          description: Unauthorized
+      '405':
+          description: Method Not Allowed
+      '500':
+          description: Internal Server Error
+          body:
+            application/json:
+              type: CustomerLocationTypes.Error
+      '501':
+          description: Not Implemented
+      '502':
+          description: Bad Gateway
+    

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
+	<error-handler name="common-error-handler" doc:id="288fe565-a527-4186-b2c7-48227e03e08e" >
+		
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="140c5f4a-0a56-4d9a-b194-6fec098a46ea" type="ANY" >
+			<ee:transform doc:name="Set Error Variables" doc:id="1ca04c5d-5ca8-43d3-88d0-31fe8549d703" >
+				<ee:message />
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[500]]></ee:set-variable>
+					<ee:set-variable variableName="responseDescription" ><![CDATA[if(error.errorType.Identifier != null)
+((error.errorType.namespace default "" ) ++ ":" 
+++ (error.errorType.Identifier default"")) 
+else "UNKNOWN"
+]]></ee:set-variable>
+					<ee:set-variable variableName="additionalDetails" ><![CDATA[error.description]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="Send Error Response" doc:id="01be4c60-d402-47f8-a0cb-e679ad4a9004" name="shared-flows-send-error-response" />
+		</on-error-continue>
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="42386b77-76f0-4bab-94a5-a089ae7ddec6" type="WEATHER_DATA:INTERNAL_SERVER_FAILURE">
+			<ee:transform doc:name="Set Error Variables" doc:id="a2537e14-19d7-4c1f-9e8e-70858323ca92">
+				<ee:message />
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[500]]></ee:set-variable>
+					<ee:set-variable variableName="responseDescription"><![CDATA[if(error.errorType.Identifier != null)
+((error.errorType.namespace default "" ) ++ ":" 
+++ (error.errorType.Identifier default"")) 
+else "UNKNOWN"
+]]></ee:set-variable>
+					<ee:set-variable variableName="additionalDetails"><![CDATA[error.description]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="Send Error Response" doc:id="40ce0d7e-0f28-42ed-be9c-125352a1f704" name="shared-flows-send-error-response" />
+		</on-error-continue>
+	</error-handler>
+</mule>
