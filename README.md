@@ -85,7 +85,7 @@ Note: Again, HTTP-REQUEST-CONFIGURATION can be maintained in the properties fold
 ---
 {
 	q : vars.cityandcountry,
-	appid : "d6766ea74b0d1a0e007025a47ed6afa2"
+	appid : **************************
 }]]]></http:query-params>
 		</http:request>
 
