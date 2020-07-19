@@ -17,9 +17,46 @@ This document describes the details of the example within the context of Anypoin
 
 2) Assuming Customer city- Melbourne and Customer country- Australia (AU)
 
-Usage:
+Usage/ How to run the code:
+- refer PostmanResponseforApi.png for the response
+
+Run in Postman-
+
+Method- POST
+URL- customer-location-and-weather-api.us-e2.cloudhub.io/api/data
+Headers-
+contant-type: application/json
+Body-
+{
+  "name": "John",
+  "lastName": "Smith",
+  "dateTime": "2019-01-31T19:00:00Z",
+  "city": "Melbourne",
+  "country": "au"
+}
+Authentication-
+Note: I have made it public for now and haven't maintained the username and password. You can put anything to access this api for now as this is a sample api
+Basic Auth:
+Username: anything
+Password: anything
+Response-
+{
+  "lastName": "Smith",
+  "name": "John",
+  "timmeZone": "36000",
+  "offfset": null,
+  "fullName": "John Smith",
+  "temperatureCelcius": 282.9,
+  "dateTime": "2020-07-20T10:44:36.406Z",
+  "city": "Melbourne",
+  "location": "AU"
+}
+
+
+
 1) Import the JAR file in anypoint studio to run the project
 - refer customer-location-and-weather-api-1.0.0-SNAPSHOT-nule-application(1).jar file attached
+Right click on the project-> Run As->  Select the API to run
 OR
 copy the customer-location-and-weather-api project in Anypoint studio Workspace
 2) Import the RAML API specification in the design Center to access the Mock 
@@ -69,11 +106,11 @@ output application/json
 	country: payload.country
 }]]></ee:set-variable>
 
-b) save city and country in a variable to pass as queryParameter to the http request to get the current weather data for melbourne
+c) save city and country in a variable to pass as queryParameter to the http request to get the current weather data for melbourne
 <ee:set-variable variableName="cityandcountry" ><![CDATA[payload.city ++ "," ++ payload.country]]></ee:set-variable>
 			</ee:variables>
 
-c) create a HTTP-REQUEST-CONFIGURATION (GET method) in the global-config.xml for getting current weather data for Melbourne,au
+d) create a HTTP-REQUEST-CONFIGURATION (GET method) in the global-config.xml for getting current weather data for Melbourne,au
 Note: Again, HTTP-REQUEST-CONFIGURATION can be maintained in the properties folder and encrypted using secure properties tool for security. I haven't done it for now as this is a dummy project and have hardcoded the values for now.
 
 <http:request-config name="Weather-Data-HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="2558699a-dd20-427f-9a59-76fd2bdc589a" >
@@ -85,16 +122,16 @@ Note: Again, HTTP-REQUEST-CONFIGURATION can be maintained in the properties fold
 ---
 {
 	q : vars.cityandcountry,
-	appid : **************************
+	appid : "d6766ea74b0d1a0e007025a47ed6afa2"
 }]]]></http:query-params>
 		</http:request>
 
-d) Validate if the http request to open weather map was successful by using Validate Size element from the mule palette
+e) Validate if the http request to open weather map was successful by using Validate Size element from the mule palette
 <validation:validate-size doc:name="Check if current weather data is retrieved" doc:id="3892ed9c-e9db-40ad-9cad-655beaaffb47" value="#[payload]" min="1" message="Current weather data retrieval failure">
 			<error-mapping sourceType="VALIDATION:INVALID_SIZE" targetType="WEATHER_DATA:INTERNAL_SERVER_FAILURE" />
 		</validation:validate-size>
 
-e) Transform the response from the open weather map to the output message using dataweave
+f) Transform the response from the open weather map to the output message using dataweave
 - convert timmeZone from Number to String
 - for fullName, concatenate the name and lastName from the input request
 - dateTime, ISO 8601 for location + 1day is obtained by dateTime: now() + |P1D|
@@ -118,4 +155,24 @@ output application/json
 			</ee:message>
 		</ee:transform>
 
+g) Log the completion of weather information details using Logger
+<logger level="INFO" doc:name="Completed" doc:id="630007b5-8e17-4881-a7f3-590f5cceee21" message="Completion of Weather information details"/>
+    
+Deployment:
+Note- Deployment Properties such as environment, mule key, vCores and Workers can be maintained in Cloudhub plugin in pom.xml file
+1) Right click on the project-> Anypoint Platform -> Deploy to Cloudhub
+2) Select the environment to deploy
+3) Define the Runtime Version- 4.3.0, Worker Size- 0.1 vCcores and Workers- 1 for the api
+
+Automated deployment using CI/CD:
+Using GitLab Tool- 
+1) In gitlab-ci.yml create stages- Build, Test, Package, Deploy-Dev, Deploy-Staging, Deploy-Prod
+2) Check for MUnit 75% coverage in test stage
+3) Deploying script-
+
+script:
+    - cd mulesoft/customer-location-and-weather-api
+    - mvn mule:deploy $MAVEN_CLI_OPTS
+      -Dusername=$CLOUDHUB_USERNAME -Dpassword=$CLOUDHUB_PASSWORD -Dcloudhub.application.name=customer-location-and-weather-api-dev
+      -Denvironment=Dev -DworkerNumber=$CH_SINGLE_WORKER_NUMBER -DworkerType=$CH_WORKER_TYPE -Dregion=$CH_Region -Dmule.env=dev -DMULE_KEY=$CLOUDHUB_MULE_KEY -e
 
